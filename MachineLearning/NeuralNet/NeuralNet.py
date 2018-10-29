@@ -1,60 +1,29 @@
 import numpy as np
+from pyLibs.randomInit import simpleRandomInit
+from pyLibs.forwardProp import simpleForwardProp
+from pyLibs.backProp import simpleBackProp
+from pyLibs.learning import simpleTrain
 
-def numElems(ws):
-	n = 0
-	for x,y in ws:
-		n += x*y
-	return n
+import pyLibs.getData as data
+import pyLibs.mathFuns as m
 
-def forwardProp(X, shapes, weights, biass, funs):
-    As = [X]
-    Zs = []
-    A = X
-    nw = 0
-    nb = 0
+from functools import partial
 
-    for fun,shape in zip(funs, shapes):
+def callback(Ys, As, Zs, Ws, bs):
+	print(m.logCost(As[-1], Ys, Ys.shape[0]), As[-1], Ys)
 
-    	size = shape[0]*shape[1]
+if __name__ == "__main__":
+	# Test on xor
+	trainData = data.getXor()
 
-    	#Take weights
-    	W = weights[nw:size].reshape(shape)
-    	nw += size
+	arh = [trainData[0].shape[0]] + [10, 1]
 
-    	#Take bias'
-    	b = biass[nb:shape[0]]
-    	nb += broj
+	# Neural net initialization
+	nIter = 5
+	forwardprop = simpleForwardProp
+	backprop = simpleBackProp
+	Ws, bs = simpleRandomInit(arh)
+	funs, grads = [m.relu, m.sigmoid], [m.step, m.dsigmoid]
+	hparameters = {"alpha": 2}
 
-        Z = W.dot(A) + b
-        A = fun(Z)
-        Zs.append(Z)
-        As.append(A)
-
-    return As, Zs
-
-def forwardProp(X, weights, biass, funs):
-    As = [X]
-    Zs = []
-    A = X
-    for fun,W,b in zip(funs, weights, biass):
-        Z = W.dot(A) + b
-        A = fun(Z)
-        Zs.append(Z)
-        As.append(A)
-    return As, Zs
-
-nx = 2
-ny = 1
-
-nh = [3,5]
-
-n = [nx] + nh + [ny]
-
-wshapes = zip(n[1:], n)
-Ws = np.random.randn(numElems(wsizes))
-Wss = []
-tmp = 0
-
-for shape in wshapes:
-	size = shape[0]*shape[1]
-	Wss.append(Ws[tmp:size])
+	simpleTrain(nIter, trainData, forwardprop, backprop, Ws, bs, funs=funs, grads=grads, hparameters = hparameters, callback=partial(callback, trainData[1]))
