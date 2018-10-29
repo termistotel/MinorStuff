@@ -1,7 +1,8 @@
 import numpy as np
 from pyLibs.forwardProp import simpleForwardProp
+from pyLibs.backProp import numericBackProp
 
-def simpleTrain(niter, trainData, forwardprop, backprop, Ws, bs, funs, grads, hparameters, callback=lambda *x: x):
+def simpleTrain(niter, trainData, forwardprop, backprop, Ws, bs, funs, grads, cost, hparameters, callback=lambda *x: x, numericCompare=False):
 	""" train recursively trains
 
 		niter is the number of iterations
@@ -35,9 +36,25 @@ def simpleTrain(niter, trainData, forwardprop, backprop, Ws, bs, funs, grads, hp
 	grad = grads[-1]
 	D = A - Y
 
-	Ws, bs = zip(*backprop([X]+As, [None] + Zs, Ws, bs, grads[:-1], D, hparameters))
-	Ws, bs = map(lambda x: list(x), (Ws, bs))
+	# Calculate numeric gradients for debug
+	if numericCompare:
+		dWs1, dbs1 = numericBackProp(X, Y, Ws, bs, funs, cost, forwardprop, epsilon = 0.0001)
+
+	# Perform backpropagation
+	Ws, bs, gradsW, gradsb = zip(*backprop([X]+As, [None] + Zs, Ws, bs, funs, grads[:-1], cost, D, hparameters))
+	Ws, bs, gradsW, gradsb = map(lambda x: list(x), (Ws, bs, gradsW, gradsb))
+
+	# Print numeric gradient for debuging purpose
+	if numericCompare:
+		for dW1, dW in zip(dWs1, gradsW):
+			print("numeric gradient difference W: ")
+			diff = dW1-dW
+			print(diff[diff>0.000001])
+		for db1, db in zip(dbs1, gradsb):
+			print("numeric gradient difference b: ")
+			diff = db1-db
+			print(diff[diff>0.000001])
 
 	callback(As+[A], Zs+[Z], Ws, bs)
 
-	return simpleTrain(niter-1, trainData, forwardprop, backprop, Ws, bs, funs, grads, hparameters, callback)
+	return simpleTrain(niter-1, trainData, forwardprop, backprop, Ws, bs, funs, grads, cost, hparameters, callback = callback, numericCompare = numericCompare)

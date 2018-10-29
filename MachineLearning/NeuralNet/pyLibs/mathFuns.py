@@ -10,4 +10,4 @@ def logCost(neurons, result, M):
 	neurons[neurons < 0.0000001] = 0.0000001
 
 	out = -result*np.log(neurons)/M - (1-result)*np.log(1-neurons)/M
-	return np.sum(out)
+	return out

@@ -25,5 +25,6 @@ if __name__ == "__main__":
 	Ws, bs = simpleRandomInit(arh)
 	funs, grads = [m.relu, m.sigmoid], [m.step, m.dsigmoid]
 	hparameters = {"alpha": 2}
+	cost = m.logCost
 
-	simpleTrain(nIter, trainData, forwardprop, backprop, Ws, bs, funs=funs, grads=grads, hparameters = hparameters, callback=partial(callback, trainData[1]))
+	simpleTrain(nIter, trainData, forwardprop, backprop, Ws, bs, funs=funs, grads=grads, cost=cost, hparameters = hparameters, callback=partial(callback, trainData[1]), numericCompare=True)
