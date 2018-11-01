@@ -5,7 +5,8 @@ step = lambda x: x>0
 sigmoid = lambda x: 1 / (1 + np.exp(-x))
 dsigmoid = lambda x: sigmoid(x) * (1 - sigmoid(x))
 
-def logCost(neurons, result, M):
+def logCost(neurons, result):
+	M = neurons.shape[1]
 	neurons[neurons > 0.9999999] = 0.9999999
 	neurons[neurons < 0.0000001] = 0.0000001
 

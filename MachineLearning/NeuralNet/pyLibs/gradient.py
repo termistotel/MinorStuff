@@ -1,30 +1,25 @@
 import numpy as np
 
-def simpleBackProp(As, Zs, Ws, bs, funs, grads, cost, D, hparameters):
+def simpleGrad(As, Zs, Ws, bs, grads, D, **kwargs):
 	if (Ws == []) or (bs ==[]):
 		return []
 
 	Wl, bl = Ws[-1], bs[-1]
 	Zl, Al = Zs[-1], As[-1]
-	lrate = hparameters["alpha"]
-	M = Al.shape[0]
 
 	dW = D.dot(Al.T)/2
 	db = np.sum(D, axis=1, keepdims=True)/2
 
-	W = Wl - lrate/M * dW
-	b = bl - lrate/M * db
-
 	if Zl is None:
-		return [(W, b, dW, db)]
+		return [(dW, db)]
 	
 	grad = grads[-1]
 	D = Wl.T.dot(D) * grad(Zl)
 
-	return simpleBackProp(As[:-1], Zs[:-1], Ws[:-1], bs[:-1], funs, grads[:-1], cost, D, hparameters) + [(W, b, dW, db)]
+	return simpleGrad(As[:-1], Zs[:-1], Ws[:-1], bs[:-1], grads[:-1], D) + [(dW, db)]
 
 
-def numericBackProp(X, Y, Ws, bs, funs, cost, forwardProp, epsilon = 0.1): #As, Zs, Ws, bs, grads, D, hparameters):
+def numericGrad(X, Y, Ws, bs, funs, cost, forwardProp, epsilon = 0.1, **kwargs):
 	encode = lambda Ws: np.zeros((0,1)) if Ws == [] else np.append(Ws[0].reshape(-1,1), encode(Ws[1:]), axis = 0)
 	decode = lambda Wall, shapes: [] if shapes == [] else [Wall[:np.prod(shapes[0]),:].reshape(shapes[0])] + decode(Wall[np.prod(shapes[0]):,:] , shapes[1:])
 
