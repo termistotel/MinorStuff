@@ -21,7 +21,6 @@ edge = sobel
 # plt.imshow(sobel, cmap='gray')
 # plt.show()
 
-size = np.square
 rmax = int(np.sqrt(np.sum(np.square(img.shape))))
 thetaNum = 100
 rNum = 100
@@ -38,7 +37,7 @@ print(rmax)
 
 xx, yy = np.meshgrid(np.arange(xmax), np.arange(ymax))
 tt, rr = np.meshgrid(theta, radii)
-plt.imshow(xx)
+plt.imshow(img)
 plt.show()
 
 xinit = np.ones(2*rmax)
